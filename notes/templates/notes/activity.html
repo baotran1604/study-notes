@@ -1,0 +1,9 @@
+{% extends "notes/base.html" %}
+{% block content %}
+<h1>Sign-in activity</h1>
+<section class="card narrow"><h2>Recent sign-ins for {{ user.username }}</h2>
+<ul class="entries">
+{% for event in events %}<li>Signed in &middot; <time>{{ event.created|date:"Y-m-d H:i:s" }} UTC</time></li>
+{% empty %}<li>No sign-ins recorded.</li>{% endfor %}
+</ul></section>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "notes/base.html" %}
+{% block content %}
+<h1>Your notebook</h1>
+<div class="columns">
+  <section class="card">
+    <h2>Saved notes</h2>
+    <form method="get">
+      <label for="q">Search titles</label>
+      <div class="search"><input id="q" name="q" value="{{ q }}"><button>Search</button></div>
+    </form>
+    <ul class="entries">
+      {% for note in notes %}
+        <li><a href="{% url 'note' note.pk %}">{{ note.title }}</a></li>
+      {% empty %}
+        <li>{% if q %}No matching titles. <a href="{% url 'notebook' %}">Clear search</a>{% else %}Your saved notes will appear here.{% endif %}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  <section class="card"><h2>New note</h2>
+    <form method="post" action="{% url 'notebook' %}">{% csrf_token %}{{ form.as_p }}<button>Save note</button></form>
+  </section>
+</div>
+{% endblock %}

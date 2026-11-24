@@ -1,0 +1,6 @@
+{% extends "notes/base.html" %}
+{% block content %}
+<h1>Create an account</h1>
+<form class="card narrow" method="post">{% csrf_token %}{{ form.as_p }}<button>Create account</button></form>
+<p>Already registered? <a href="{% url 'login' %}">Sign in</a></p>
+{% endblock %}
