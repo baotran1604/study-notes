@@ -3,7 +3,7 @@ from django.contrib.auth.hashers import check_password, identify_hasher
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Note, SignIn
+from .models import Note, SessionEvent
 
 User = get_user_model()
 
@@ -51,7 +51,7 @@ class NotebookTests(TestCase):
             "username": first.username, "password": password,
         }), "/")
         self.assertContains(self.client.get("/account/"), "pbkdf2_sha256")
-        self.assertEqual(SignIn.objects.filter(user=first).count(), 1)
+        self.assertEqual(SessionEvent.objects.filter(user=first, kind="login").count(), 1)
         self.assertRedirects(self.client.post("/logout/"), "/login/")
 
     def test_common_password_rejected(self):

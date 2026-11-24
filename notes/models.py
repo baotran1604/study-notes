@@ -9,6 +9,7 @@ class Note(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
 
-class SignIn(models.Model):
+class SessionEvent(models.Model):
+    kind = models.CharField(max_length=10, choices=[("login", "Signed in"), ("logout", "Signed out")], default="login")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)

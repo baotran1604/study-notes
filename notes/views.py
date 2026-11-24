@@ -5,28 +5,36 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
 from .forms import NoteForm
-from .models import Note, SignIn
+from .models import Note, SessionEvent
 
 
 @require_http_methods(["GET", "POST"])
 def register(request):
-    form = UserCreationForm(request.POST if request.method == "POST" else None)
-    if request.method == "POST" and form.is_valid():
-        # The form applies the configured password validators and hashes on save.
-        form.save()
-        return redirect("login")
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("login")
+    else:
+        form = UserCreationForm()
+
     return render(request, "notes/register.html", {"form": form})
 
 
 @login_required
 @require_http_methods(["GET", "POST"])
 def notebook(request):
-    form = NoteForm(request.POST if request.method == "POST" else None)
-    if request.method == "POST" and form.is_valid():
-        note = form.save(commit=False)
-        note.owner = request.user
-        note.save()
-        return redirect("note", pk=note.pk)
+    if request.method == "POST":
+        form = NoteForm(request.POST)
+        if form.is_valid():
+            # Fill in the owner before writing the note to the database.
+            note = form.save(commit=False)
+            note.owner = request.user
+            note.save()
+            return redirect("note", pk=note.pk)
+    else:
+        form = NoteForm()
+
     query = request.GET.get("q", "")
     notes = Note.objects.filter(owner=request.user).order_by("-created", "-pk")
     if query:
@@ -49,5 +57,5 @@ def account(request):
 
 @login_required
 def activity(request):
-    events = SignIn.objects.filter(user=request.user).order_by("-created", "-pk")[:20]
+    events = SessionEvent.objects.filter(user=request.user).order_by("-created", "-pk")[:20]
     return render(request, "notes/activity.html", {"events": events})
