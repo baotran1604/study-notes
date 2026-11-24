@@ -1,0 +1,9 @@
+{% extends "notes/base.html" %}
+{% block content %}
+<h1>Python package inventory</h1>
+<section class="card narrow">
+  <h2>{{ rows|length }} package{{ rows|length|pluralize }} reported</h2>
+  <table><thead><tr><th scope="col">Package</th><th scope="col">Installed version</th></tr></thead>
+  <tbody>{% for name, version in rows %}<tr><td>{{ name }}</td><td>{{ version }}</td></tr>{% endfor %}</tbody></table>
+</section>
+{% endblock %}

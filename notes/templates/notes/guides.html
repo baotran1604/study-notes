@@ -1,0 +1,10 @@
+{% extends "notes/base.html" %}
+{% block content %}
+<h1>Study guides</h1>
+{% for guide in guides %}
+  <section class="card narrow">
+    <h2>{{ guide.name }}</h2><p>{{ guide.status }}</p>
+    {% if guide.body %}<div class="bodytext">{{ guide.body }}</div>{% endif %}
+  </section>
+{% endfor %}
+{% endblock %}

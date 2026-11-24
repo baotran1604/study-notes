@@ -11,12 +11,18 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
+import secrets
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 SECRET_KEY = (BASE_DIR / '.local-key').read_text().strip()
+# The note receipt key is separate from the authentication settings.
+NOTE_RECEIPT_KEY = secrets.token_urlsafe(48)
+# Fix 2: reuse the local persistent secret with the receipt-specific HMAC context.
+# NOTE_RECEIPT_KEY = SECRET_KEY
+
 DEBUG = False
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 LOGIN_URL = 'login'

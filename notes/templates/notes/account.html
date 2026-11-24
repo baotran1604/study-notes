@@ -4,4 +4,5 @@
 <section class="card narrow"><h2>{{ user.username }}</h2><dl>
   <dt>Password storage algorithm</dt><dd><code>{{ algorithm }}</code></dd>
 </dl><a href="{% url 'activity' %}">View account activity</a></section>
+{% if user.is_staff %}<p><a href="{% url 'inventory' %}">Python package inventory</a></p>{% endif %}
 {% endblock %}

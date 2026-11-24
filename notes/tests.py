@@ -70,3 +70,31 @@ class NotebookTests(TestCase):
         with self.assertLogs("notes.security", level="WARNING") as captured:
             self.client.post("/login/", {"username": "reader", "password": "test-input"})
         self.assertEqual([record.getMessage() for record in captured.records], ["Sign-in rejected"])
+
+    def test_staff_inventory(self):
+        self.client.force_login(self.reader)
+        self.assertEqual(self.client.get("/staff/packages/").status_code, 403)
+        self.reader.is_staff = True
+        self.reader.save()
+        self.assertContains(self.client.get("/staff/packages/"), "Django")
+
+    def test_saved_receipt_and_older_note(self):
+        self.client.force_login(self.other)
+        self.assertContains(self.client.get(reverse("note", args=[self.private.pk])), "predates save receipts")
+        response = self.client.post("/", {"title": "Week one", "body": "Read two pages."}, follow=True)
+        self.assertContains(response, "matches its receipt")
+        address = response.redirect_chain[-1][0]
+        with self.settings(NOTE_RECEIPT_KEY="different-test-key"):
+            self.assertContains(self.client.get(address), "Verification failed")
+        self.assertContains(self.client.get(address), "matches its receipt")
+
+    def test_guide_integrity(self):
+        from unittest.mock import patch
+        from .reports import CHECKSUMS
+
+        self.client.force_login(self.reader)
+        self.assertContains(self.client.get("/guides/"), "Before you start a chapter")
+        with patch.dict(CHECKSUMS, {"reading-plan.txt": "unexpected digest"}):
+            response = self.client.get("/guides/")
+            self.assertContains(response, "differs from the approved release")
+            self.assertNotContains(response, "Before you start a chapter")
